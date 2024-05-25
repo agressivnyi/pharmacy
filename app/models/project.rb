@@ -1,12 +1,10 @@
 class Project < ApplicationRecord
   belongs_to :manager, class_name: 'User', foreign_key: 'manager_id'
-  belongs_to :employee, class_name: 'User', foreign_key: 'employee_id'
+  has_and_belongs_to_many :employees, class_name: 'User', join_table: 'projects_users'
 
   has_many_attached :extra_files
 
-  validates :name, presence: true
-  validates :start_date, presence: true
-  validates :end_date, presence: true
+  validates :name, :start_date, :end_date, presence: true
 
   def as_json(options = {})
     super(options).tap do |hash|
@@ -14,6 +12,7 @@ class Project < ApplicationRecord
         hash[:extra_files_urls] = extra_files.map { |file| Rails.application.routes.url_helpers.rails_blob_url(file, only_path: true) }
       end
       hash[:extras] = extras.map { |extra| JSON.parse(extra) } rescue extras
+      hash[:employees] = employees.map { |employee| employee.as_json(only: [:id, :email, :name]) }
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_25_052802) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_25_064502) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,11 +42,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_25_052802) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "employees_projects", id: false, force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.bigint "employee_id", null: false
+    t.index ["employee_id"], name: "index_employees_projects_on_employee_id"
+    t.index ["project_id"], name: "index_employees_projects_on_project_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.integer "manager_id"
-    t.integer "employee_id"
     t.date "start_date"
     t.date "end_date"
     t.text "substances", default: [], array: true
@@ -55,6 +61,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_25_052802) do
     t.text "extras", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "employee_id"
+  end
+
+  create_table "projects_users", id: false, force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id", "user_id"], name: "index_projects_users_on_project_id_and_user_id"
+    t.index ["user_id", "project_id"], name: "index_projects_users_on_user_id_and_project_id"
   end
 
   create_table "users", force: :cascade do |t|

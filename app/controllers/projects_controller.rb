@@ -12,7 +12,9 @@ class ProjectsController < ApplicationController
   end
 
   def create
-    @project = Project.new(project_params)
+    @project = Project.new(project_params.except(:employee_ids))
+    @project.employees = User.where(id: project_params[:employee_ids]) if project_params[:employee_ids].present?
+
     if @project.save
       attach_files(@project, params[:project][:extra_files])
       render json: @project.as_json(include_file_urls: true), status: :created
@@ -23,8 +25,9 @@ class ProjectsController < ApplicationController
 
   def update
     @project = Project.find(params[:id])
-    if @project.update(project_params)
+    if @project.update(project_params.except(:employee_ids))
       attach_files(@project, params[:project][:extra_files])
+      update_employees(@project, project_params[:employee_ids])
       render json: @project.as_json(include_file_urls: true)
     else
       render json: @project.errors, status: :unprocessable_entity
@@ -41,8 +44,8 @@ class ProjectsController < ApplicationController
 
   def project_params
     params.require(:project).permit(
-      :name, :description, :manager_id, :employee_id, :start_date, :end_date, 
-      substances: [], analog: [], extras: [], extra_files: []
+      :name, :description, :manager_id, :start_date, :end_date,
+      substances: [], analog: [], extras: [], extra_files: [], employee_ids: []
     )
   end
 
@@ -51,6 +54,23 @@ class ProjectsController < ApplicationController
 
     files.each do |file|
       project.extra_files.attach(file)
+    end
+  end
+
+  def update_employees(project, employee_ids)
+    return unless employee_ids
+
+    current_employee_ids = project.employees.pluck(:id)
+    new_employee_ids = employee_ids.map(&:to_i)
+
+    # Add new employees
+    (new_employee_ids - current_employee_ids).each do |id|
+      project.employees << User.find(id)
+    end
+
+    # Remove employees not in the new list
+    (current_employee_ids - new_employee_ids).each do |id|
+      project.employees.delete(User.find(id))
     end
   end
 end
