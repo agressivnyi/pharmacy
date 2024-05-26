@@ -1,6 +1,7 @@
 class Project < ApplicationRecord
   belongs_to :manager, class_name: 'User', foreign_key: 'manager_id'
   has_and_belongs_to_many :employees, class_name: 'User'
+  has_many :stages, dependent: :destroy
 
   has_many_attached :extra_files
 

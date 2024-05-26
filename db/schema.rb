@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_25_111124) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_26_032911) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,6 +49,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_25_111124) do
     t.index ["project_id"], name: "index_employees_projects_on_project_id"
   end
 
+  create_table "performers_stages", id: false, force: :cascade do |t|
+    t.bigint "stage_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["stage_id"], name: "index_performers_stages_on_stage_id"
+    t.index ["user_id"], name: "index_performers_stages_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -76,6 +83,33 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_25_111124) do
     t.index ["user_id", "project_id"], name: "index_projects_users_on_user_id_and_project_id"
   end
 
+  create_table "stage_tasks", force: :cascade do |t|
+    t.bigint "stage_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.date "due_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stage_id"], name: "index_stage_tasks_on_stage_id"
+  end
+
+  create_table "stages", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "project_id", null: false
+    t.bigint "predecessor_id"
+    t.bigint "successor_id"
+    t.string "status", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.text "description"
+    t.jsonb "attached_files", default: []
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["predecessor_id"], name: "index_stages_on_predecessor_id"
+    t.index ["project_id"], name: "index_stages_on_project_id"
+    t.index ["successor_id"], name: "index_stages_on_successor_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -86,6 +120,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_25_111124) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "performers_stages", "stages"
+  add_foreign_key "performers_stages", "users"
   add_foreign_key "projects", "users", column: "employee_id"
   add_foreign_key "projects", "users", column: "manager_id"
+  add_foreign_key "stage_tasks", "stages"
+  add_foreign_key "stages", "projects"
+  add_foreign_key "stages", "stages", column: "predecessor_id"
+  add_foreign_key "stages", "stages", column: "successor_id"
 end
