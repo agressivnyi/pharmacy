@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyText
+  status: MyString
+  start_date: 2024-05-26
+  end_date: 2024-05-26
+  stage: one
+  performer: one
+  parent_task: one
+  attached_files: 
+
+two:
+  name: MyString
+  description: MyText
+  status: MyString
+  start_date: 2024-05-26
+  end_date: 2024-05-26
+  stage: two
+  performer: two
+  parent_task: two
+  attached_files: 

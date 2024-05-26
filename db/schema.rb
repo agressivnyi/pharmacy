@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_26_032911) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_26_103122) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_26_032911) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.bigint "user_id", null: false
+    t.bigint "task_id", null: false
+    t.bigint "parent_comment_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_comment_id"], name: "index_comments_on_parent_comment_id"
+    t.index ["task_id"], name: "index_comments_on_task_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "employees_projects", id: false, force: :cascade do |t|
@@ -110,6 +122,23 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_26_032911) do
     t.index ["successor_id"], name: "index_stages_on_successor_id"
   end
 
+  create_table "tasks", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "status", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.bigint "stage_id", null: false
+    t.bigint "performer_id"
+    t.bigint "parent_task_id"
+    t.jsonb "attached_files", default: []
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_task_id"], name: "index_tasks_on_parent_task_id"
+    t.index ["performer_id"], name: "index_tasks_on_performer_id"
+    t.index ["stage_id"], name: "index_tasks_on_stage_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -120,6 +149,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_26_032911) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "comments", "comments", column: "parent_comment_id"
+  add_foreign_key "comments", "tasks"
+  add_foreign_key "comments", "users"
   add_foreign_key "performers_stages", "stages"
   add_foreign_key "performers_stages", "users"
   add_foreign_key "projects", "users", column: "employee_id"
@@ -128,4 +160,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_26_032911) do
   add_foreign_key "stages", "projects"
   add_foreign_key "stages", "stages", column: "predecessor_id"
   add_foreign_key "stages", "stages", column: "successor_id"
+  add_foreign_key "tasks", "stages"
+  add_foreign_key "tasks", "tasks", column: "parent_task_id"
+  add_foreign_key "tasks", "users", column: "performer_id"
 end

@@ -7,6 +7,11 @@ Rails.application.routes.draw do
       member do
         patch :change_status
       end
+      resources :tasks do
+        member do
+          patch :change_status
+        end
+      end
     end
   end
 end
