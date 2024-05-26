@@ -1,10 +1,11 @@
 class Project < ApplicationRecord
   belongs_to :manager, class_name: 'User', foreign_key: 'manager_id'
-  has_and_belongs_to_many :employees, class_name: 'User', join_table: 'projects_users'
+  has_and_belongs_to_many :employees, class_name: 'User'
 
   has_many_attached :extra_files
 
   validates :name, :start_date, :end_date, presence: true
+  validates :commercial_name, :international_no_patent, :chemical_name, :project_type, presence: true, if: :new_preperate?
 
   def as_json(options = {})
     super(options).tap do |hash|
