@@ -72,6 +72,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_164718) do
     t.string "name"
     t.text "description"
     t.integer "manager_id"
+    t.integer "employee_id"
     t.date "start_date"
     t.date "end_date"
     t.text "substances", default: [], array: true
@@ -80,19 +81,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_164718) do
     t.text "extras", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "employee_id"
     t.boolean "new_preperate"
     t.string "commercial_name"
     t.string "international_no_patent"
     t.string "chemical_name"
     t.string "project_type"
-  end
-
-  create_table "projects_users", id: false, force: :cascade do |t|
-    t.bigint "project_id", null: false
-    t.bigint "user_id", null: false
-    t.index ["project_id", "user_id"], name: "index_projects_users_on_project_id_and_user_id"
-    t.index ["user_id", "project_id"], name: "index_projects_users_on_user_id_and_project_id"
   end
 
   create_table "stage_tasks", force: :cascade do |t|
