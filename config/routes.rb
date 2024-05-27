@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   # Route for registering and sending email
   post 'register_and_send_email', to: 'users#register_and_send_email'
   
+  # Route for updating user information
+  put '/auth/create_password_and_username_by_user', to: 'users#update_info_by_user'
+  
   # Nested resources for projects, stages, and tasks
   resources :projects do
     resources :stages do

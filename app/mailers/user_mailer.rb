@@ -3,7 +3,7 @@ class UserMailer < ApplicationMailer
 
   def registration_email(user, token)
     @user = user
-    @url  = "http://localhost:3000/auth/email_by_code/#{token}"
+    @url  = "http://localhost:5173/auth/email_by_code/#{token}"
     mail(to: @user.email, subject: 'Welcome to My Awesome Site')
   end
 end

@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :authenticate_request, only: [:login]
+  skip_before_action :authenticate_request, only: [:login, :update_info_by_user]
   before_action :admin_only, only: [:create, :register_and_send_email]
 
   def create
@@ -38,6 +38,24 @@ class UsersController < ApplicationController
       render json: { message: 'User already exists. Registration email sent again.' }, status: :ok
     end
   end
+
+  def update_info_by_user
+  # Decode the JWT token to get user email
+  decoded_token = JWT.decode(params[:validate_number], Rails.application.secrets.secret_key_base, true, algorithm: 'HS256')
+  email = decoded_token.first['email']
+  
+  @user = User.find_by(email: email)
+  if @user
+    if @user.update(user_params)
+      render json: { message: 'User information updated successfully' }, status: :ok
+    else
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+    end
+  else
+    render json: { errors: ['User not found'] }, status: :not_found
+  end
+end
+
 
   private
 
