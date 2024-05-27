@@ -23,7 +23,8 @@ class UsersController < ApplicationController
   def register_and_send_email
     @user = User.find_by(email: params[:email])
     if @user.nil?
-      @user = User.new(email: params[:email], password: SecureRandom.hex(10), name: 'Temporary Name')
+      # Create a new user without specifying password and name
+      @user = User.new(email: params[:email])
       if @user.save
         token = @user.generate_jwt
         UserMailer.registration_email(@user, token).deliver_now
