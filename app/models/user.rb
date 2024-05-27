@@ -2,8 +2,13 @@ class User < ApplicationRecord
   has_secure_password
 
   validates :email, presence: true, uniqueness: true
+  validates :name, presence: true
+
   has_many :managed_projects, class_name: 'Project', foreign_key: 'manager_id'
-  has_and_belongs_to_many :assigned_projects, class_name: 'Project', join_table: 'employees_projects'
+  has_and_belongs_to_many :assigned_projects, class_name: 'Project', join_table: 'projects_users'
+  has_and_belongs_to_many :performing_stages, class_name: 'Stage', join_table: 'performers_stages'
+  has_many :comments
+  has_and_belongs_to_many :tasks, join_table: 'stage_tasks', foreign_key: 'performer_id'
 
   def self.from_token_request(request)
     email = request.params["auth"] && request.params["auth"]["email"]
