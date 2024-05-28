@@ -23,7 +23,6 @@ class UsersController < ApplicationController
   def register_and_send_email
     @user = User.find_by(email: params[:email])
     if @user.nil?
-      # Create a new user without specifying password and name
       @user = User.new(email: params[:email])
       if @user.save
         token = @user.generate_jwt
@@ -40,22 +39,20 @@ class UsersController < ApplicationController
   end
 
   def update_info_by_user
-  # Decode the JWT token to get user email
-  decoded_token = JWT.decode(params[:validate_number], Rails.application.secrets.secret_key_base, true, algorithm: 'HS256')
-  email = decoded_token.first['email']
-  
-  @user = User.find_by(email: email)
-  if @user
-    if @user.update(user_params)
-      render json: { message: 'User information updated successfully' }, status: :ok
-    else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-    end
-  else
-    render json: { errors: ['User not found'] }, status: :not_found
-  end
-end
+    decoded_token = JWT.decode(params[:validate_number], Rails.application.secrets.secret_key_base, true, algorithm: 'HS256')
+    email = decoded_token.first['email']
 
+    @user = User.find_by(email: email)
+    if @user
+      if @user.update(user_params)
+        render json: { message: 'User information updated successfully' }, status: :ok
+      else
+        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      end
+    else
+      render json: { errors: ['User not found'] }, status: :not_found
+    end
+  end
 
   private
 
@@ -64,7 +61,7 @@ end
   end
 
   def admin_only
-    unless current_user.is_admin?
+    unless current_user&.is_admin?
       render json: { errors: ['Unauthorized access'] }, status: :unauthorized
     end
   end
