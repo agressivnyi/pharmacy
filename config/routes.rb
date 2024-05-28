@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   
   # Route for updating user information
   put '/auth/create_password_and_username_by_user', to: 'users#update_info_by_user'
+  get 'auth/update_user/me', to: 'users#me'
   
   # Nested resources for projects, stages, and tasks
   resources :projects do

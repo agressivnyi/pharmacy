@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_request, only: [:login]
   before_action :admin_only, only: [:create, :register_and_send_email, :update_info_by_user]
+  before_action :authenticate_request, only: [:me]
 
   def create
     @user = User.new(user_params)
@@ -9,6 +10,10 @@ class UsersController < ApplicationController
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  def me
+    render json: current_user, status: :ok
   end
 
   def login
