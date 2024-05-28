@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_request, only: [:login]
-  before_action :admin_only, only: [:create, :register_and_send_email]
+  before_action :admin_only, only: [:create, :register_and_send_email, :update_info_by_user]
 
   def create
     @user = User.new(user_params)
@@ -38,10 +38,31 @@ class UsersController < ApplicationController
     end
   end
 
+  def update_info_by_user
+    token = params[:validate_number]
+    decoded_token = JsonWebToken.decode(token)
+    user_id = decoded_token[:user_id]
+
+    if current_user.is_admin? && user_id
+      @user = User.find(user_id)
+      if @user.update(user_params_update)
+        render json: { message: 'User information updated successfully' }, status: :ok
+      else
+        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      end
+    else
+      render json: { errors: ['Unauthorized access or invalid token'] }, status: :unauthorized
+    end
+  end
+
   private
 
   def user_params
     params.require(:user).permit(:email, :password, :name)
+  end
+
+  def user_params_update
+    params.permit(:email, :create_password, :create_username)
   end
 
   def admin_only
