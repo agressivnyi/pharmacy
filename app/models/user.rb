@@ -2,10 +2,8 @@ class User < ApplicationRecord
   has_secure_password
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  # Remove presence validation for name
-  validates :name, allow_nil: true
+  validates :name, length: { maximum: 50 }, allow_nil: true
 
-  # Allow password and name to be nullable
   attribute :password, :string, default: nil
   attribute :name, :string, default: nil
 
