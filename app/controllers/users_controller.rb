@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  skip_before_action :authenticate_request, only: [:login]
-  before_action :authenticate_request, except: [:login]
-  before_action :admin_only, only: [:create, :register_and_send_email, :update_info_by_user]
+  skip_before_action :authenticate_request, only: [:login, :update_info_by_user]
+  before_action :authenticate_request, except: [:login, :update_info_by_user]
+  before_action :admin_only, only: [:create, :register_and_send_email]
 
   def create
     @user = User.new(user_params)
