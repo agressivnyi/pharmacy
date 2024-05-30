@@ -48,7 +48,7 @@ class UsersController < ApplicationController
     decoded_token = JsonWebToken.decode(token)
     user_id = decoded_token[:user_id]
 
-    if current_user.is_admin? && user_id
+    if user_id
       @user = User.find(user_id)
       if @user.update(user_params_update)
         render json: { message: 'User information updated successfully' }, status: :ok
