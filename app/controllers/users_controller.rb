@@ -45,12 +45,13 @@ class UsersController < ApplicationController
 
   def update_info_by_user
     token = params[:validate_number]
-    decoded_token = JsonWebToken.decode(token)
-    user_id = decoded_token[:user_id]
+    decoded_token = JsonWebToken.decode(token) rescue nil
 
-    if user_id
+    if decoded_token
+      user_id = decoded_token[:user_id]
       @user = User.find(user_id)
-      if @user.update(user_params_update)
+
+      if @user&.update(user_params_update)
         render json: { message: 'User information updated successfully' }, status: :ok
       else
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -67,7 +68,7 @@ class UsersController < ApplicationController
   end
 
   def user_params_update
-    params.permit(:email, :create_password, :create_username)
+    params.permit(:create_password, :create_username)
   end
 
   def admin_only
