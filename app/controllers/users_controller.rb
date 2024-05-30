@@ -28,7 +28,7 @@ class UsersController < ApplicationController
   def register_and_send_email
     @user = User.find_by(email: params[:email])
     if @user.nil?
-      @user = User.new(email: params[:email], password: SecureRandom.hex(10), name: 'Temporary Name')
+      @user = User.new(email: params[:email], password: SecureRandom.hex(10), name: 'Temporary Name', is_project_manager: params[:is_project_manager], is_superuser: params[:is_superuser])
       if @user.save
         token = @user.generate_jwt
         UserMailer.registration_email(@user, token).deliver_now
@@ -63,7 +63,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :name)
+    params.require(:user).permit(:email, :password, :name, :is_project_manager, :is_superuser)
   end
 
   def user_params_update
